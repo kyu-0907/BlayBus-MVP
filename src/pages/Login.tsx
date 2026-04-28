@@ -55,35 +55,35 @@ const Login = () => {
       // 3. 자바스크립트 객체(Object) 정의
       const defaultVideoConfig = {
         videoSrc: 'https://videos.pexels.com/video-files/4884242/4884242-uhd_2560_1440_30fps.mp4', // Pexels 학습/교육 테마 고화질 무료 비디오
-        opacity: 0.15, // 배경 투명도
+        opacity: 0.45, // 배경 투명도
         fadeInTime: 1500
       };
 
       // 4. jQuery 플러그인(Plugin) 직접 구현 및 확장
-      $.fn.makeBackgroundVideo = function(customOptions: any) {
+      $.fn.makeBackgroundVideo = function (customOptions: any) {
         // 객체(Object) 병합
         const settings = $.extend({}, defaultVideoConfig, customOptions);
 
-        return this.each(function(this: HTMLElement) {
+        return this.each(function (this: HTMLElement) {
           const $element = $(this);
-          
+
           // 동영상 DOM 요소 생성 (크롬 자동재생 버그 방지를 위해 속성 직접 문자열 표기 및 prop 강제 적용)
           const $video = $('<video autoplay loop muted playsinline crossorigin="anonymous">')
-          .attr('src', settings.videoSrc)
-          .prop('muted', true) // 크롬 정책은 JS property 측의 muted===true를 꼼꼼하게 검사함
-          .css({
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            minWidth: '100%',
-            minHeight: '100%',
-            width: 'auto',
-            height: 'auto',
-            opacity: settings.opacity,
-            objectFit: 'cover',
-            zIndex: 0
-          });
+            .attr('src', settings.videoSrc)
+            .prop('muted', true) // 크롬 정책은 JS property 측의 muted===true를 꼼꼼하게 검사함
+            .css({
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              minWidth: '100%',
+              minHeight: '100%',
+              width: 'auto',
+              height: 'auto',
+              opacity: settings.opacity,
+              objectFit: 'cover',
+              zIndex: 0
+            });
 
           // 부모 컨테이너 CSS 조정
           $element.css({
