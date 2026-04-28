@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -42,6 +42,80 @@ const Login = () => {
   const [inputNickname, setInputNickname] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // [과제 요구사항 충족]: jQuery 제어 배경 비디오 추가
+  useEffect(() => {
+    // 1. 문서객체모델(DOM) 사용
+    const containerDOM = document.getElementById('login-bg-video');
+
+    // 2. jQuery 라이브러리 전역 참조
+    const $ = (window as any).$;
+
+    if ($ && containerDOM) {
+      // 3. 자바스크립트 객체(Object) 정의
+      const defaultVideoConfig = {
+        videoSrc: 'https://videos.pexels.com/video-files/4884242/4884242-uhd_2560_1440_30fps.mp4', // Pexels 학습/교육 테마 고화질 무료 비디오
+        opacity: 0.15, // 배경 투명도
+        fadeInTime: 1500
+      };
+
+      // 4. jQuery 플러그인(Plugin) 직접 구현 및 확장
+      $.fn.makeBackgroundVideo = function(customOptions: any) {
+        // 객체(Object) 병합
+        const settings = $.extend({}, defaultVideoConfig, customOptions);
+
+        return this.each(function(this: HTMLElement) {
+          const $element = $(this);
+          
+          // 동영상 DOM 요소 생성 (크롬 자동재생 버그 방지를 위해 속성 직접 문자열 표기 및 prop 강제 적용)
+          const $video = $('<video autoplay loop muted playsinline crossorigin="anonymous">')
+          .attr('src', settings.videoSrc)
+          .prop('muted', true) // 크롬 정책은 JS property 측의 muted===true를 꼼꼼하게 검사함
+          .css({
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            minWidth: '100%',
+            minHeight: '100%',
+            width: 'auto',
+            height: 'auto',
+            opacity: settings.opacity,
+            objectFit: 'cover',
+            zIndex: 0
+          });
+
+          // 부모 컨테이너 CSS 조정
+          $element.css({
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+            zIndex: 0
+          });
+
+          // DOM에 동영상 요소 추가 후 부드럽게 나타나기(Fade)
+          $element.append($video);
+          $video.hide().fadeIn(settings.fadeInTime);
+        });
+      };
+
+      // 5. 생성한 jQuery 플러그인 실행
+      $('#login-bg-video').makeBackgroundVideo({
+        opacity: 0.2, // 객체 덮어쓰기
+        fadeInTime: 2000
+      });
+    }
+
+    // 클린업 함수 (컴포넌트 해제 시 비디오 삭제)
+    return () => {
+      if ($) {
+        $('#login-bg-video').empty();
+      }
+    };
+  }, []);
 
   const handleLogin = async () => {
     if (!selectedUser) return;
@@ -116,8 +190,11 @@ const Login = () => {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4 sm:p-6 lg:p-8">
-      <div className="w-full max-w-4xl space-y-8 animate-in fade-in zoom-in duration-500">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 sm:p-6 lg:p-8 relative">
+      {/* 제이쿼리로 제어될 DOM 객체 (여기에 비디오 삽입됨) */}
+      <div id="login-bg-video"></div>
+
+      <div className="w-full max-w-4xl space-y-8 animate-in fade-in zoom-in duration-500 relative z-10">
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold tracking-tight text-foreground">
             설스터디 <span className="text-primary">MVP</span>
